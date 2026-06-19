@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code Base Camp #1 ｜ 講座スライド</title>
+<style>
+  :root{
+    --ink:#111; --paper:#fff; --line:#111; --gray:#666; --mark:#ffe000; --soft:#f4f4f4;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{height:100%;}
+  body{font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;background:#d9d9d9;color:var(--ink);overflow:hidden;}
+
+  .deck{height:100vh;width:100vw;display:grid;place-items:center;}
+  .stage{position:relative;width:min(97vw,165vh);aspect-ratio:16/9;box-shadow:0 12px 44px rgba(0,0,0,.22);background:var(--paper);}
+  .slide{position:absolute;inset:0;display:none;flex-direction:column;padding:4.4% 4.6%;background:var(--paper);}
+  .slide.active{display:flex;animation:fade .35s ease;}
+  @keyframes fade{from{opacity:0;}to{opacity:1;}}
+
+  /* header */
+  .head{display:flex;align-items:baseline;gap:18px;border-bottom:3px solid var(--ink);padding-bottom:1.1vh;flex-shrink:0;}
+  .kicker{font-size:clamp(11px,1vw,15px);font-weight:800;letter-spacing:.2em;color:var(--ink);}
+  .head h2{font-size:clamp(20px,2.5vw,36px);font-weight:900;letter-spacing:.01em;line-height:1.1;}
+  .head .no{margin-left:auto;font-size:clamp(34px,4.6vw,70px);font-weight:900;color:#e4e4e4;line-height:.78;}
+
+  .body{flex:1;display:flex;flex-direction:column;justify-content:stretch;padding:2.2vh 0 0;min-height:0;gap:1.6%;}
+
+  h1{font-size:clamp(28px,4vw,60px);line-height:1.18;font-weight:900;letter-spacing:.01em;}
+  .big{font-size:clamp(18px,2.1vw,32px);line-height:1.5;font-weight:800;}
+  .sub{font-size:clamp(14px,1.5vw,21px);line-height:1.7;color:#222;}
+  .gray{color:var(--gray);}
+
+  .mark{background:var(--mark);color:#111;font-weight:900;padding:1px 6px;box-decoration-break:clone;-webkit-box-decoration-break:clone;}
+  .ul{background:linear-gradient(transparent 56%, var(--mark) 56%);font-weight:900;padding:0 2px;}
+
+  .grid{display:grid;gap:1.6%;flex:1;min-height:0;}
+  .g2{grid-template-columns:repeat(2,1fr);}
+  .g3{grid-template-columns:repeat(3,1fr);}
+  .g5{grid-template-columns:repeat(5,1fr);}
+
+  .box{border:2.5px solid var(--ink);border-radius:4px;padding:2.4% 2.6%;display:flex;flex-direction:column;justify-content:center;min-height:0;}
+  .box .lab{font-size:clamp(12px,1.15vw,17px);font-weight:900;letter-spacing:.03em;border-bottom:2px solid var(--ink);padding-bottom:7px;margin-bottom:12px;}
+  .box .n{font-size:clamp(30px,3.7vw,54px);font-weight:900;line-height:1;}
+  .box .n small{font-size:.34em;font-weight:900;}
+  .box p{font-size:clamp(12px,1.3vw,18px);line-height:1.65;color:#222;}
+  .box.fill{background:var(--mark);}
+  .box.fill .lab{border-color:#111;}
+  .box.top{justify-content:flex-start;}
+  .box.ctr{text-align:center;align-items:center;}
+
+  /* 番号付きリスト（行間ゆったり） */
+  ul.list{list-style:none;display:flex;flex-direction:column;flex:1;justify-content:center;gap:0;}
+  ul.list li{font-size:clamp(14px,1.65vw,24px);line-height:1.65;padding:1.7vh 0 1.7vh 60px;position:relative;display:flex;align-items:center;border-top:1.5px solid #e0e0e0;}
+  ul.list li:last-child{border-bottom:1.5px solid #e0e0e0;}
+  ul.list li b{font-weight:900;}
+  ul.list li .idx{position:absolute;left:0;top:50%;transform:translateY(-50%);font-weight:900;font-size:clamp(20px,2.3vw,32px);width:46px;text-align:left;}
+  ul.list li .idx .u{background:var(--mark);padding:0 5px;}
+
+  ul.mini{list-style:none;display:flex;flex-direction:column;justify-content:center;gap:1.1em;flex:1;}
+  ul.mini li{font-size:clamp(13px,1.5vw,22px);line-height:1.7;padding:0 0 0 22px;position:relative;}
+  ul.mini li::before{content:"";position:absolute;left:0;top:.6em;width:9px;height:9px;background:var(--ink);transform:rotate(45deg);}
+  ul.mini li b{font-weight:900;}
+
+  /* 比較（Claude Code を強く見せる） */
+  .vs{display:grid;grid-template-columns:1fr 1.08fr;gap:4%;flex:1;align-items:center;min-height:0;}
+  .vs-col{position:relative;border:2.5px solid var(--ink);border-radius:6px;padding:3% 3.2%;height:92%;display:flex;flex-direction:column;justify-content:center;}
+  .vs-col .vh{font-weight:900;font-size:clamp(15px,1.8vw,26px);border-bottom:2px solid var(--ink);padding-bottom:9px;margin-bottom:14px;letter-spacing:.02em;}
+  .vs-col ul{list-style:none;display:flex;flex-direction:column;gap:.9em;}
+  .vs-col li{font-size:clamp(13px,1.5vw,22px);line-height:1.45;padding-left:20px;position:relative;}
+  .vs-col li::before{content:"";position:absolute;left:0;top:.5em;width:9px;height:9px;transform:rotate(45deg);}
+  .vs-col.muted{background:#f5f5f5;color:#9a9a9a;}
+  .vs-col.muted .vh{border-color:#cfcfcf;color:#9a9a9a;}
+  .vs-col.muted li::before{background:#c2c2c2;}
+  .vs-col.strong{background:#111;color:#fff;border-color:#111;transform:scale(1.06);box-shadow:0 16px 44px rgba(0,0,0,.34);}
+  .vs-col.strong .vh{border-color:var(--mark);font-size:clamp(17px,2vw,30px);}
+  .vs-col.strong li{font-weight:700;}
+  .vs-col.strong li::before{background:var(--mark);}
+  .vs-col.strong .tag{position:absolute;top:-14px;right:14px;background:var(--mark);color:#111;font-weight:900;font-size:clamp(11px,1.15vw,16px);padding:4px 12px;border-radius:999px;box-shadow:0 4px 12px rgba(0,0,0,.25);}
+
+  .flow{display:flex;gap:0;flex:1;align-items:stretch;}
+  .flow .step{flex:1;border:2.5px solid var(--ink);padding:2.4% 2%;display:flex;flex-direction:column;justify-content:center;}
+  .flow .step+.step{border-left:none;}
+  .flow .step .mo{font-weight:900;font-size:clamp(14px,1.65vw,24px);margin-bottom:12px;border-bottom:2px solid var(--ink);padding-bottom:8px;}
+  .flow .step p{font-size:clamp(13px,1.35vw,20px);line-height:1.6;}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:3.2%;flex:1;align-items:stretch;min-height:0;}
+  .two>*{display:flex;flex-direction:column;justify-content:center;min-height:0;}
+
+  .prompt{position:relative;width:fit-content;max-width:100%;background:#fff;border:2.5px solid var(--ink);
+    border-radius:16px 16px 16px 5px;padding:.9vh 15px;margin:.9vh 0 .9vh 13px;
+    font-family:"SFMono-Regular",Consolas,"Yu Gothic",monospace;
+    font-size:clamp(11px,1.25vw,17px);line-height:1.45;font-weight:700;
+    box-shadow:2px 3px 0 rgba(17,17,17,.14);}
+  .prompt::before{content:"";position:absolute;left:-12px;bottom:8px;width:0;height:0;
+    border:9px solid transparent;border-right-color:var(--ink);}
+  .prompt::after{content:"";position:absolute;left:-7px;bottom:10px;width:0;height:0;
+    border:7px solid transparent;border-right-color:#fff;}
+
+  .lead-line{height:13px;background:var(--mark);width:130px;margin:2vh 0;}
+
+  .cover-meta{font-size:clamp(13px,1.45vw,21px);line-height:1.9;font-weight:700;}
+  .chips{display:flex;gap:12px;flex-wrap:wrap;margin-top:2.2vh;}
+  .chip{border:2.5px solid var(--ink);border-radius:999px;padding:7px 18px;font-size:clamp(12px,1.3vw,19px);font-weight:800;}
+  .chip b{background:var(--mark);padding:0 5px;}
+
+  /* コネクタ（ロゴ＋手順） */
+  .svc{display:flex;flex-direction:column;align-items:center;text-align:center;border:2.5px solid var(--ink);border-radius:4px;padding:3% 3%;justify-content:flex-start;}
+  .svc img.logo{width:clamp(30px,3.4vw,52px);height:clamp(30px,3.4vw,52px);object-fit:contain;margin-bottom:9px;}
+  .svc .nm{font-size:clamp(13px,1.55vw,22px);font-weight:900;letter-spacing:.01em;}
+  .svc .ro{font-size:clamp(10px,1.1vw,15px);color:var(--gray);margin-top:4px;}
+  .svc .stp{font-size:clamp(10px,1.08vw,15px);line-height:1.5;margin-top:10px;padding-top:9px;border-top:1.5px solid #e2e2e2;color:#333;}
+
+  /* スクリーンショット枠 */
+  .shot{position:relative;border:2.5px solid var(--ink);border-radius:4px;overflow:hidden;background:#fafafa;min-height:0;}
+  .shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff;}
+  .shot .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#b3b3b3;font-weight:800;padding:8%;line-height:1.6;}
+  .shot .ph small{font-weight:600;font-size:.82em;color:#c4c4c4;margin-top:6px;}
+
+  .nav{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:8px;align-items:center;z-index:10;}
+  .nav button{background:#fff;color:#111;border:2px solid #111;border-radius:4px;padding:7px 14px;cursor:pointer;font-size:14px;font-weight:800;}
+  .nav button:hover{background:var(--mark);}
+  .counter{font-size:13px;font-weight:800;min-width:56px;text-align:center;color:#111;background:#fff;border:2px solid #111;border-radius:4px;padding:7px 6px;}
+  @media print{.nav{display:none;}}
+</style>
+</head>
+<body>
+<div class="deck">
+<div class="stage" id="stage">
+
+  <!-- 00 表紙 -->
+  <section class="slide active">
+    <div class="head"><span class="kicker">CLAUDE CODE BASE CAMP ｜ #1</span><span class="no">00</span></div>
+    <div class="body" style="justify-content:center">
+      <div class="kicker gray" style="margin-bottom:12px">知識ゼロから始める AI 活用</div>
+      <h1>すべての人のための<br><span class="mark">Claude Code</span>、はじめの一歩。</h1>
+      <div class="lead-line"></div>
+      <div class="chips">
+        <span class="chip">開催 <b>6月24日</b></span>
+        <span class="chip">理解＋セットアップ <b>約1時間</b></span>
+        <span class="chip">デスクトップ版で完結（<b>ターミナル不使用</b>）</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 講師紹介 -->
+  <section class="slide">
+    <div class="head"><span class="kicker">PART 0 ・ INTRO</span><h2>講師紹介</h2><span class="no">01</span></div>
+    <div class="body">
+      <div class="grid g2">
+        <div class="box top"><div class="lab">田中 優大　株式会社VMK 代表</div>
+          <ul class="mini">
+            <li>AIを軸にした事業開発・業務自動化を実践</li>
+            <li><b>自動化している業務</b>と定量成果</li>
+            <li>「最初は自分も未経験だった」という共感</li>
+          </ul>
+        </div>
+        <div class="box top"><div class="lab">安藤　株式会社Ggrow 代表</div>
+          <ul class="mini">
+            <li>AI検索対策・SEO対策の<b>支援事業</b>を運営</li>
+            <li>母がSEOアフィリエイター。<b>SEO歴10年</b>の現場感</li>
+            <li>これまで<span class="mark">法人100社以上</span>のSEO・AI検索対策を支援</li>
+          </ul>
+        </div>
+      </div>
+      <div class="box fill" style="flex:none"><p class="big">受講者も軽く自己紹介を：<span class="ul">お名前・職種・PCへの苦手意識</span></p></div>
+    </div>
+  </section>
+
+  <!-- 02 安藤の事例 -->
+  <section class="slide">
+    <div class="head"><span class="kicker">PART 0 ・ CASE</span><h2>安藤の事例 ―― AIと“1人”で事業を回す</h2><span class="no">02</span></div>
+    <div class="body">
+      <div class="grid g3" style="flex:none">
+        <div class="box fill ctr"><div class="lab">新規事業の月商</div><div class="n">300<small>万円</small></div><p style="margin-top:8px">AIと1人だけで運用</p></div>
+        <div class="box ctr"><div class="lab">構築〜1ヶ月の受注</div><div class="n">20<small>件</small></div><p style="margin-top:8px">セットアップ後1ヶ月で立ち上げ</p></div>
+        <div class="box ctr"><div class="lab">フォーム営業 アポ率</div><div class="n">1<small>%</small></div><p style="margin-top:8px">リスト〜送信〜改善まで全自動</p></div>
+      </div>
+      <div class="grid g2">
+        <div class="box top"><div class="lab">営業フローを丸ごと自動化</div>
+          <ul class="mini">
+            <li>フォーム営業ツールを自社開発<span class="gray" style="font-size:.85em">（リスト作成→送信→改善をAI内で完結）</span></li>
+            <li>アポ獲得 → 登録 → <b>提案戦略の作成</b></li>
+            <li>議事録から<b>ネクストアクション抽出</b> → お礼メール下書き格納まで</li>
+          </ul>
+        </div>
+        <div class="box top"><div class="lab">バックオフィスもAIで</div>
+          <ul class="mini">
+            <li>経理・財務を<b>すべてAIで管理</b>。経営状況を<span class="mark">一言で抽出</span></li>
+            <li>Webマーケの分析・レポートを自動化</li>
+            <li>支援予算を“実行”に回せ、<b>継続率が改善</b></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 Base Campとは -->
+  <section class="slide">
+    <div class="head"><span class="kicker">PART 0 ・ ABOUT</span><h2>Claude Code Base Camp とは</h2><span class="no">03</span></div>
+    <div class="body">
+      <div class="grid g3">
+        <div class="box top"><div class="lab">最初のハードル</div>
+          <p class="big" style="margin-bottom:8px">始めるのは、腰が重い。</p>
+          <p>環境構築・設定…の入口でつまずきがち。<span class="gray">だから多くの人が踏み出せない。</span></p>
+        </div>
+        <div class="box top"><div class="lab">でも、始めてしまえば</div>
+          <p class="big" style="margin-bottom:8px"><span class="mark">あらゆることを自分でできる。</span></p>
+          <p>メール・予定・資料・調べ物…日々の業務をどんどん任せられる。</p>
+        </div>
+        <div class="box top"><div class="lab">わからなくても大丈夫</div>
+          <p class="big" style="margin-bottom:8px">できないことは、聞けばいい。</p>
+          <p><b>Claude Code 自身に聞けば、たいていなんとかなる。</b></p>
+        </div>
+      </div>
+      <div class="box fill" style="flex:none"><p class="big">＝ その<span class="ul">“一歩目”を支援する</span>のが、Base Camp（登山口）の役割。</p></div>
+    </div>
+  </section>
+
+  <!-- 04 本日の流れ -->
+  <section class="slide">
+    <div class="head"><span class="kicker">PART 0 ・ AGENDA</span><h2>本日の流れ</h2><span class="no">04</span></div>
+    <div class="body">
+      <div class="flow">
+        <div class="step"><div class="mo">〜10分｜導入</div><p>講師紹介<br>Base Campとは<br>本日のゴール</p></div>
+        <div class="step"><div class="mo">〜15分｜理解編</div><p>Claude Codeとは<br>チャットとの違い<br>できること3つ</p></div>
+        <div class="step" style="background:var(--mark)"><div class="mo">〜30分｜セットアップ編</div><p><b>インストール → 設定 → 連携 → 動作確認デモ</b></p></div>
+      </div>
+      <div class="box" style="flex:none"><p class="big"><b>ルール：</b>分からない用語はその場で止めてOK／一緒に操作／<span class="ul">最後に“やってみたい業務”を1つ持ち帰る</span></p></div>
+    </div>
+  </section>
+
+  <!-- 05 なぜ全員 -->
+  <section class="slide">
+    <div class="head"><span class="kicker">PART 1 ・ WHY</span><h2>なぜ「すべての人」が使うべきか</h2><span class="no">05</span></div>
+    <div class="body">
+      <ul class="list">
+        <li><span class="idx">01</span>AIは「エンジニアの道具」から<b>全職種の道具</b>へ変わった</li>
+        <li><span class="idx">02</span>検索・要約だけでなく、実際に<span class="mark">手を動かして作業まで代行</span></li>
+        <li><span class="idx">03</span>英語もコードも不要。<b>日本語で話しかけるだけ</b></li>
+        <li><span class="idx">04</span>「忙しいけど人を雇うほどでもない」業務こそ効く</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 06 違い -->
+  <section class="slide">
+    <div class="head"><span class="kicker">PART 1 ・ DIFFERENCE</span><h2>チャット版AIと Claude Code の違い</h2><span class="no">06</span></div>
+    <div class="body">
+      <div class="vs">
+        <div class="vs-col muted">
+          <div class="vh">チャット版AI（ChatGPT 等）</div>
+          <ul>
+            <li>文章を返すだけ。その先は自分でやる</li>
+            <li>「例を教えて」→ 例文どまり</li>
+            <li>コピペ・保存・送信は手作業</li>
+            <li>立ち位置：相談相手</li>
+          </ul>
+        </div>
+        <div class="vs-col strong">
+          <span class="tag">できることが段違い</span>
+          <div class="vh">Claude Code</div>
+          <ul>
+            <li>PC・Gmail・カレンダーを<span class="mark">実際に操作</span></li>
+            <li>「返信漏れ探して」→ <b>自分で見て一覧化</b></li>
+            <li>作成・保存・送信まで<b>一気通貫</b></li>
+            <li>立ち位置：<span class="mark">実働アシスタント</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 できること3つ -->
+  <section class="slide">
+    <div class="head"><span class="kicker">PART 1 ・ STRENGTH</span><h2>“チャットには無い”強み ―― 3つの使い方</h2><span class="no">07</span></div>
+    <div class="body">
+      <div class="grid g3">
+        <div class="box top"><div class="lab">01　各サービス・ファイル操作</div>
+          <p style="margin-bottom:.6vh">Notion・ドライブ等に<b>つながって参照</b>できる。</p>
+          <div class="prompt">ドライブの議事録を参照して、私のToDoを出して</div>
+          <div class="prompt">Notionの議事録から決定事項をまとめて</div>
+          <div class="prompt">直近1ヶ月で未返信のメールを一覧にして</div>
+        </div>
+        <div class="box top"><div class="lab">02　開発</div>
+          <p style="margin-bottom:.6vh">欲しい道具を<b>その場で作れる</b>。</p>
+          <div class="prompt">経費精算をするための社内アプリを作って</div>
+          <div class="prompt">問い合わせを分類するツールを作って</div>
+          <div class="prompt">見積書を作る入力フォームを作って</div>
+        </div>
+        <div class="box top"><div class="lab">03　エージェント化</div>
+          <p style="margin-bottom:.6vh">処理を<b>定期実行で自動化</b>。</p>
+          <div class="prompt">新規MTGが入ったらアポ管理シートに追加して</div>
+          <div class="prompt">毎朝、今日の予定とToDoを通知して</div>
+          <div class="prompt">新着の問い合わせをNotionに自動記録して</div>
+        </div>
+      </div>
+      <div class="box fill" style="flex:none"><p class="big">決定的な差＝<span class="ul">各種サービス・ローカルファイルを“参照して動ける”</span>こと。</p></div>
+    </div>
+  </section>
+
+  <!-- 08 知識不要 -->
+  <section class="slide">
+    <div class="head"><span class="kicker">PART 1 ・ NO CODE</span><h2>知識もコードも要りません</h2><span class="no">08</span></div>
+    <div class="body">
+      <ul class="list">
+        <li><span class="idx"><span class="u">A</span></span>ターミナルもプログラミングも使わない（<b>デスクトップ版で完結</b>）</li>
+        <li><span class="idx"><span class="u">B</span></span>専門用語が分からなくても、設定で<span class="mark">“やさしく説明”</span>させられる</li>
+        <li><span class="idx"><span class="u">C</span></span>間違えても壊れない／取り返しがつく。<b>気軽に試してOK</b></li>
+        <li><span class="idx"><span class="u">D</span></span>「完璧な指示」より<b>「とりあえず話しかける」</b>が正解</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 09 全体像 -->
+  <section class="slide">
+    <div class="head"><span class="kicker">PART 2 ・ OVERVIEW</span><h2>セットアップは5ステップ</h2><span class="no">09</span></div>
+    <div class="body">
+      <ul class="list">
+        <li><span class="idx">1</span><b>デスクトップ版をインストール</b>　<span class="gray">アプリを入れてログイン</span></li>
+        <li><span class="idx">2</span><b>「Claudeへの指示」欄を設定</b>　<span class="gray">回答をやさしいトーンに</span></li>
+        <li><span class="idx">3</span><b>コネクタ連携</b>　<span class="gray">Gmail / カレンダー / ドライブ / Slack / Notion</span></li>
+        <li><span class="idx">4</span><b>Claude in Chrome</b>　<span class="gray">Web記事を読めるように</span></li>
+        <li><span class="idx">5</span><b>動作確認デモ</b>　<span class="gray">成功体験で締める</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 10 install -->
+  <section class="slide">
+    <div class="head"><span class="kicker">PART 2 ・ STEP 1</span><h2>① デスクトップ版のインストール</h2><span class="no">10</span></div>
+    <div class="body two">
+      <ul class="mini">
+        <li>公式サイトからアプリをダウンロード<span class="gray" style="font-size:.85em">（ターミナル不使用）</span></li>
+        <li>ログイン／アカウント作成</li>
+        <li>画面の基本構成を確認<span class="gray" style="font-size:.85em">（入力欄・履歴・設定）</span></li>
+        <li>初回起動時の許可ダイアログに「許可」</li>
+      </ul>
+      <div class="shot">
+        <img src="images/setup-install.png" onerror="this.style.display='none'">
+        <div class="ph">インストール画面<br><small>images/setup-install.png</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 指示欄 -->
+  <section class="slide">
+    <div class="head"><span class="kicker">PART 2 ・ STEP 2</span><h2>②「Claudeへの指示」欄の設定</h2><span class="no">11</span></div>
+    <div class="body two">
+      <div>
+        <ul class="mini">
+          <li>設定 →「<b>Claudeへの指示</b>」欄を開く</li>
+          <li>下のひと言を貼る → <span class="mark">全チャットがやさしくなる</span></li>
+          <li>記入前後で回答の変化を実演</li>
+        </ul>
+        <div class="prompt" style="font-size:clamp(12px,1.35vw,18px)">専門用語は使わず、初心者にもわかる言葉で説明してください</div>
+      </div>
+      <div class="shot">
+        <img src="images/setup-instruction.png" onerror="this.style.display='none'">
+        <div class="ph">設定「Claudeへの指示」画面<br><small>images/setup-instruction.png</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 12 コネクタ -->
+  <section class="slide">
+    <div class="head"><span class="kicker">PART 2 ・ STEP 3</span><h2>③ コネクタ連携</h2><span class="no">12</span></div>
+    <div class="body">
+      <div class="grid g5">
+        <div class="svc">
+          <img class="logo" src="https://www.google.com/s2/favicons?sz=128&domain=mail.google.com" alt="" onerror="this.style.display='none'">
+          <div class="nm">Gmail</div><div class="ro">メール操作</div>
+          <div class="stp">設定 → コネクタ → 追加 → Googleでログイン許可</div>
+        </div>
+        <div class="svc">
+          <img class="logo" src="https://www.google.com/s2/favicons?sz=128&domain=calendar.google.com" alt="" onerror="this.style.display='none'">
+          <div class="nm">カレンダー</div><div class="ro">予定管理</div>
+          <div class="stp">同じGoogleアカウントを許可するだけ</div>
+        </div>
+        <div class="svc">
+          <img class="logo" src="https://www.google.com/s2/favicons?sz=128&domain=drive.google.com" alt="" onerror="this.style.display='none'">
+          <div class="nm">ドライブ</div><div class="ro">資料検索</div>
+          <div class="stp">同じGoogleアカウントを許可するだけ</div>
+        </div>
+        <div class="svc">
+          <img class="logo" src="https://www.google.com/s2/favicons?sz=128&domain=slack.com" alt="" onerror="this.style.display='none'">
+          <div class="nm">Slack</div><div class="ro">チャット確認</div>
+          <div class="stp">Slackでサインイン → ワークスペースを許可</div>
+        </div>
+        <div class="svc">
+          <img class="logo" src="https://www.google.com/s2/favicons?sz=128&domain=notion.so" alt="" onerror="this.style.display='none'">
+          <div class="nm">Notion</div><div class="ro">メモ更新</div>
+          <div class="stp">Notionでログイン → ページのアクセスを許可</div>
+        </div>
+      </div>
+      <div class="box" style="flex:none"><p class="big">基本は「<b>追加 → ログイン → 許可</b>」の3手。<span class="ul">Canva は任意</span>／ログイン済みだと認証が早い。</p></div>
+    </div>
+  </section>
+
+  <!-- 13 chrome -->
+  <section class="slide">
+    <div class="head"><span class="kicker">PART 2 ・ STEP 4</span><h2>④ Claude in Chrome の設定</h2><span class="no">13</span></div>
+    <div class="body two">
+      <div>
+        <ul class="mini">
+          <li>役割：<span class="mark">Web記事の読み込み</span>に必要<span class="gray" style="font-size:.85em">（未設定だと弾かれる）</span></li>
+          <li>Chrome拡張機能を追加 → 権限を許可</li>
+          <li>動作確認：記事を「要約して」で試す</li>
+        </ul>
+        <div class="prompt">このページ、結局なにがポイントか教えて</div>
+      </div>
+      <div class="shot">
+        <img src="images/setup-chrome.png" onerror="this.style.display='none'">
+        <div class="ph">Claude in Chrome 拡張の画面<br><small>images/setup-chrome.png</small></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 14 動作確認 -->
+  <section class="slide">
+    <div class="head"><span class="kicker">PART 2 ・ STEP 5</span><h2>⑤ 動作確認デモ</h2><span class="no">14</span></div>
+    <div class="body two">
+      <div>
+        <ul class="mini">
+          <li>ゴール：成功を<b>“成功体験”で確認</b></li>
+          <li>Gmail連携済みの状態で、下を入力</li>
+          <li>一覧が出れば<span class="mark">連携OK</span></li>
+          <li>発展 → <b>返信下書きまで作らせる</b></li>
+        </ul>
+        <div class="prompt">直近1ヶ月のメールから、まだ返信していないものを一覧にして</div>
+      </div>
+      <div class="box fill ctr"><div class="lab" style="border-color:#111">ここが今日の山場</div>
+        <p class="big">「おお、勝手にやってくれた！」を全員で体験。</p>
+        <p style="margin-top:10px"><span class="ul">動いた瞬間が一番の学習。</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 15 プロンプト集 -->
+  <section class="slide">
+    <div class="head"><span class="kicker">APPENDIX</span><h2>よく使うプロンプト集</h2><span class="no">15</span></div>
+    <div class="body">
+      <div class="grid g3">
+        <div class="box top"><div class="lab">各サービス・ファイル操作</div>
+          <div class="prompt">ドライブの議事録を参照して、私のToDoを出して</div>
+          <div class="prompt">Notionの議事録から決定事項とネクストアクションをまとめて</div>
+          <div class="prompt">直近1ヶ月で未返信のメールを一覧にして</div>
+          <div class="prompt">今週の予定を整理して、空き時間を教えて</div>
+          <div class="prompt">Slackの未読から重要なものだけ要約して</div>
+        </div>
+        <div class="box top"><div class="lab">開発（社内ツール化）</div>
+          <div class="prompt">経費精算をするための社内アプリを作って</div>
+          <div class="prompt">問い合わせ内容を分類するツールを作って</div>
+          <div class="prompt">スプレッドシートの集計を自動化する仕組みを作って</div>
+          <div class="prompt">見積書を作るための簡単な入力フォームを作って</div>
+        </div>
+        <div class="box top"><div class="lab">エージェント化（定期実行）</div>
+          <div class="prompt">カレンダーに新規MTGが入ったらアポ管理シートに追加して</div>
+          <div class="prompt">毎朝、今日の予定とToDoをまとめて通知して</div>
+          <div class="prompt">新着の問い合わせメールをNotionに自動で記録して</div>
+          <div class="prompt">毎週金曜に今週の活動をレポートにまとめて</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 16 クロージング -->
+  <section class="slide">
+    <div class="head"><span class="kicker">CLOSING</span><span class="no">16</span></div>
+    <div class="body" style="justify-content:center">
+      <h1>今日はスタート地点。<br><span class="mark">まずは1つ、任せてみよう。</span></h1>
+      <div class="lead-line"></div>
+      <p class="big" style="font-weight:700">分からなくなったら、Claudeに「やさしく教えて」と聞けばいい。<br>次回は、各自の業務に合わせた実践へ。</p>
+      <div class="cover-meta" style="margin-top:28px">Claude Code Base Camp #1　／　田中 優大（株式会社VMK）・安藤（株式会社Ggrow）</div>
+    </div>
+  </section>
+
+</div>
+</div>
+
+<div class="nav">
+  <button onclick="go(-1)">← 前へ</button>
+  <span class="counter" id="counter">1 / 17</span>
+  <button onclick="go(1)">次へ →</button>
+</div>
+
+<script>
+  const slides=[...document.querySelectorAll('.slide')];let i=0;
+  function render(){slides.forEach((s,n)=>s.classList.toggle('active',n===i));document.getElementById('counter').textContent=(i+1)+' / '+slides.length;}
+  function go(d){i=Math.min(slides.length-1,Math.max(0,i+d));render();}
+  document.addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key===' ')go(1);
+    if(e.key==='ArrowLeft')go(-1);
+    if(e.key==='Home'){i=0;render();}
+    if(e.key==='End'){i=slides.length-1;render();}
+  });
+  render();
+</script>
+</body>
+</html>
